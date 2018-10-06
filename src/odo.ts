@@ -115,7 +115,7 @@ class OdoImpl implements Odo {
 
     public async getProjects(): Promise<OpenShiftObject[]> {
         return this.cli.execute(
-            'oc get project -o jsonpath="{range .items[*]}{.metadata.name}{\'\\n\'}{end}"', {}
+            `oc get project -o jsonpath="{range .items[*]}{.metadata.name}{\\"\\n\\"}{end}"`, {}
         ).then((result) => {
             let projs: OpenShiftObject[] = [];
             const stdout: string = result.stdout.trim();
@@ -131,7 +131,7 @@ class OdoImpl implements Odo {
 
     public async getApplications(project: OpenShiftObjectImpl): Promise<OpenShiftObject[]> {
         const odoData = jsYaml.safeLoad(fs.readFileSync(path.join(Platform.getUserHomePath(), '.kube', 'odo'), 'utf8'));
-        let activeApps: any[] = odoData && odoData.activeApplications ? odoData.activeApplications : [];
+        const activeApps: any[] = odoData && odoData.activeApplications ? odoData.activeApplications : [];
         const apps: string[] = activeApps.filter((value) => value.project === project.getName()).map((value) => value.name);
         return apps.map<OpenShiftObject>((value) => new OpenShiftObjectImpl(project, value, 'application', this));
     }
@@ -204,7 +204,7 @@ class OdoImpl implements Odo {
             `odo catalog list services`, {}
         );
 
-        if(result.error) {
+        if (result.error) {
             throw new Error(result.stdout.trim());
         }
         return result.stdout.trim().split('\n').slice(1).map((value) => {
